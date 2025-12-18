@@ -18,7 +18,20 @@ const App = () => {
 
   const addPerson = (newName, newNumber) => {
     if (persons.some(person => person.name === newName)) {
-      alert(`${newName} is already added to phonebook`)
+      if (confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+        const changedPerson = persons.find(person => person.name === newName)
+        const updatedPerson = {
+          ...changedPerson,
+          number: newNumber
+        }
+        
+        peopleService
+          .update(changedPerson.id, updatedPerson)
+          .then(() => {
+            setPersons(persons.map(person => person.id !== changedPerson.id ? person : updatedPerson))
+          })
+      }
+      // exit the function to avoid adding a duplicate
       return
     }
 
