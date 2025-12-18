@@ -1,18 +1,18 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
+import peopleService from './services/people'
 
 const App = () => {
   const [persons, setPersons] = useState([]) 
   const [filterValue, setFilterValue] = useState('')
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        setPersons(response.data)
+    peopleService
+      .getAll()
+      .then(persons => {
+        setPersons(persons)
       })
   }, [])
 
@@ -27,11 +27,11 @@ const App = () => {
       number: newNumber,
     }
 
-    axios
-      .post('http://localhost:3001/persons', personObject)
-      .then(response => {
-        setPersons(persons.concat(response.data))
-    })
+    peopleService
+      .create(personObject)
+      .then(newPerson => {
+        setPersons(persons.concat(newPerson))
+      })
   }
 
   const filteredPersons = persons.filter(person =>
