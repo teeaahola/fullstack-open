@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
+import Notification from './components/Notification'
 import peopleService from './services/people'
 
 const App = () => {
   const [persons, setPersons] = useState([]) 
   const [filterValue, setFilterValue] = useState('')
+  const [notification, setNotification] = useState(null)
 
   useEffect(() => {
     peopleService
@@ -29,6 +31,11 @@ const App = () => {
           .update(changedPerson.id, updatedPerson)
           .then(() => {
             setPersons(persons.map(person => person.id !== changedPerson.id ? person : updatedPerson))
+
+            setNotification(`Changed ${newName}'s number`)
+            setTimeout(() => {
+              setNotification(null)
+            }, 3000)
           })
       }
       // exit the function to avoid adding a duplicate
@@ -44,6 +51,11 @@ const App = () => {
       .create(personObject)
       .then(newPerson => {
         setPersons(persons.concat(newPerson))
+
+        setNotification(`Added ${newName}`)
+        setTimeout(() => {
+          setNotification(null)
+        }, 3000)
       })
   }
 
@@ -67,6 +79,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notification} />
       <Filter onFilterChange={setFilterValue} />
       <h2>Add a new</h2>
       <PersonForm addPerson={addPerson} />
