@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import Filter from './components/Filter'
 import Countries from './components/Countries'
-import Country from './components/Country'
+import CountryData from './components/CountryData'
 import countryService from './services/countries'
 
 function App() {
@@ -17,7 +17,7 @@ function App() {
       })
     
     if (filteredCountries.length > 10) {
-      setAlert('Too many matches, specify another filter')
+      setAlert("Too many matches, specify another filter")
     } else {
       setAlert(null)
     }
@@ -33,8 +33,8 @@ function App() {
       {alert}
       {filteredCountries.length <= 10
         && filteredCountries.length > 1
-        && <Countries countries={filteredCountries} />}
-      {filteredCountries.length === 1 && <Country country={filteredCountries[0]} />}
+        && <Countries countries={filteredCountries} showCountry={setFilter} />}
+      {filteredCountries.length === 1 && <CountryData country={filteredCountries[0]} />}
     </div>
   )
 }

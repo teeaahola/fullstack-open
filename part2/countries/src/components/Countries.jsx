@@ -1,5 +1,7 @@
-const Countries = ({ countries }) => {
-  return countries.map((country) => <div key={country.name.common}>{country.name.common}</div>)
+import Country from "./Country"
+
+const Countries = ({ countries, showCountry }) => {
+  return countries.map((country) => <Country key={country.name.common} country={country} showCountry={showCountry} />)
 }
 
 export default Countries
