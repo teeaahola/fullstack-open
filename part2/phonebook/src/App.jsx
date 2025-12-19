@@ -3,12 +3,14 @@ import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
 import Notification from './components/Notification'
+import Error from './components/Error'
 import peopleService from './services/people'
 
 const App = () => {
   const [persons, setPersons] = useState([]) 
   const [filterValue, setFilterValue] = useState('')
   const [notification, setNotification] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect(() => {
     peopleService
@@ -36,6 +38,13 @@ const App = () => {
             setTimeout(() => {
               setNotification(null)
             }, 3000)
+          })
+          .catch(error => {
+            setErrorMessage(`Information of ${newName} has already been removed from server`)
+            setTimeout(() => {
+              setErrorMessage(null)
+            }, 5000)
+            setPersons(persons.filter(person => person.id !== changedPerson.id))
           })
       }
       // exit the function to avoid adding a duplicate
@@ -80,6 +89,7 @@ const App = () => {
     <div>
       <h2>Phonebook</h2>
       <Notification message={notification} />
+      <Error message={errorMessage} />
       <Filter onFilterChange={setFilterValue} />
       <h2>Add a new</h2>
       <PersonForm addPerson={addPerson} />
