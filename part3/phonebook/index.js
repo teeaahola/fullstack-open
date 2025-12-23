@@ -10,17 +10,21 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :b
 
 const Person = require('./models/person')
 
-app.get('/info', (request, response) => {
-  Person.find({}).then(persons => {
-    const date = new Date()
-    response.send(`<p>Phonebook has info for ${persons.length} people</p><p>${date}</p>`)
-  })
+app.get('/info', (request, response, next) => {
+  Person.find({})
+    .then(persons => {
+      const date = new Date()
+      response.send(`<p>Phonebook has info for ${persons.length} people</p><p>${date}</p>`)
+    })
+    .catch(error => next(error))
 })
 
-app.get('/api/persons', (request, response) => {
-  Person.find({}).then(persons => {
-    response.json(persons)
-  })
+app.get('/api/persons', (request, response, next) => {
+  Person.find({})
+    .then(persons => {
+      response.json(persons)
+    })
+    .catch(error => next(error))
 })
 
 app.get('/api/persons/:id', (request, response, next) => {
@@ -43,7 +47,7 @@ app.delete('/api/persons/:id', (request, response, next) => {
     .catch(error => next(error))
 })
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
   const body = request.body
 
   if (!body.name) {
@@ -63,9 +67,11 @@ app.post('/api/persons', (request, response) => {
     number: body.number,
   })
 
-  person.save().then(person => {
-    response.json(person)
-  })
+  person.save()
+    .then(person => {
+      response.json(person)
+    })
+    .catch(error => next(error))
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
