@@ -10,6 +10,13 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :b
 
 const Person = require('./models/person')
 
+app.get('/info', (request, response) => {
+  Person.find({}).then(persons => {
+    const date = new Date()
+    response.send(`<p>Phonebook has info for ${persons.length} people</p><p>${date}</p>`)
+  })
+})
+
 app.get('/api/persons', (request, response) => {
   Person.find({}).then(persons => {
     response.json(persons)
