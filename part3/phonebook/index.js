@@ -5,11 +5,11 @@ app.use(express.static('dist'))
 app.use(express.json())
 const morgan = require('morgan')
 
-morgan.token('body', function (req, res) { return JSON.stringify(req.body) })
+morgan.token('body', (req, _res) => { return JSON.stringify(req.body) })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
 const Person = require('./models/person')
-const opts = { runValidators: true };
+const opts = { runValidators: true }
 
 app.get('/info', (request, response, next) => {
   Person.find({})
@@ -42,7 +42,7 @@ app.get('/api/persons/:id', (request, response, next) => {
 
 app.delete('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndDelete(request.params.id)
-    .then(result => {
+    .then(_result => {
       response.status(204).end()
     })
     .catch(error => next(error))
@@ -65,7 +65,7 @@ app.post('/api/persons', (request, response, next) => {
 
 app.put('/api/persons/:id', (request, response, next) => {
   const body = request.body
-  console.log("id", request.params.id)
+  console.log('id', request.params.id)
 
   Person.findByIdAndUpdate(request.params.id, body, opts)
     .then(person => {
