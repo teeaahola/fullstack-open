@@ -41,11 +41,13 @@ const App = () => {
           })
           .catch(error => {
             console.log(error)
-            setErrorMessage(`Information of ${newName} has already been removed from server`)
+            setErrorMessage(error.response.data.error)
             setTimeout(() => {
               setErrorMessage(null)
             }, 5000)
-            setPersons(persons.filter(person => person.id !== changedPerson.id))
+            if (!error.response.data.error.includes('Validation failed')) {
+              setPersons(persons.filter(person => person.id !== changedPerson.id))
+            }
           })
       }
       // exit the function to avoid adding a duplicate
@@ -66,6 +68,12 @@ const App = () => {
         setTimeout(() => {
           setNotification(null)
         }, 3000)
+      })
+      .catch(error => {
+        setErrorMessage(error.response.data.error)
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
       })
   }
 
