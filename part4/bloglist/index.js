@@ -1,25 +1,9 @@
 require('dotenv').config()
 const express = require('express')
-const mongoose = require('mongoose')
 
 const app = express()
 
-const blogSchema = mongoose.Schema({
-  title: String,
-  author: String,
-  url: String,
-  likes: Number,
-})
-
-const Blog = mongoose.model('Blog', blogSchema)
-
-const mongoUrl = process.env.MONGODB_URI
-mongoose
-  .connect(mongoUrl, { family: 4 })
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(err => {
-    console.error('MongoDB connection error:', err.message)
-  })
+const Blog = require('./models/blog')
 
 app.use(express.json())
 
@@ -35,9 +19,6 @@ app.post('/api/blogs', (request, response) => {
   blog.save()
     .then(result => {
       response.status(201).json(result)
-    })
-    .catch(error => {
-      response.status(400).json({ error: error.message })
     })
 })
 

@@ -2,8 +2,8 @@ POST http://localhost:3003/api/blogs
 Content-Type: application/json
 
 {
-  "title": "Using a New Database",
+  "title": "Testing Model Middleware",
   "author": "John Doe",
   "url": "testurl",
-  "likes": 5
+  "likes": 0
 }
