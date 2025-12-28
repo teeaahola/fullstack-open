@@ -30,9 +30,18 @@ const mostBlogs = (blogs) => {
   return found ? { author: found[0], blogs: found[1] } : null
 }
 
+const mostLikes = (blogs) => {
+  const grouped = _.groupBy(blogs, 'author')
+  const likes = _.mapValues(grouped, (o) => totalLikes(o))
+  const pairs = _.toPairs(likes)
+  const found = _.maxBy(pairs, (o) => o[1])
+  return found ? { author: found[0], likes: found[1] } : null
+}
+
 module.exports = {
   dummy,
   totalLikes,
   favoriteBlog,
-  mostBlogs
+  mostBlogs,
+  mostLikes
 }
