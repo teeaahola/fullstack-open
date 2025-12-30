@@ -133,6 +133,24 @@ describe('when there are initially some blogs saved', () => {
       assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1)
     })
   })
+
+  describe.only('updating a blog', () => {
+    test('succeeds with status code 200 when given valid id', async () => {
+      const blogsAtStart = await helper.blogsInDb()
+      const blogToUpdate = blogsAtStart[0]
+      const likesAtStart = blogToUpdate.likes
+
+      await api.put(`/api/blogs/${blogToUpdate.id}`)
+        .send({ ...blogToUpdate, likes: likesAtStart + 1 })
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+      const blogsAtEnd = await helper.blogsInDb()
+      const updatedBlog = blogsAtEnd.find(b => b.id === blogToUpdate.id)
+      const likesAtEnd = updatedBlog.likes
+      assert.strictEqual(likesAtStart + 1, likesAtEnd)
+    })
+  })
 })
 
 after(async () => {
