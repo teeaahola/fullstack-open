@@ -134,7 +134,7 @@ describe('when there are initially some blogs saved', () => {
     })
   })
 
-  describe.only('updating a blog', () => {
+  describe('updating a blog', () => {
     test('succeeds with status code 200 when given valid id', async () => {
       const blogsAtStart = await helper.blogsInDb()
       const blogToUpdate = blogsAtStart[0]

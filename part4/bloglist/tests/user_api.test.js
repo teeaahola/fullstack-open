@@ -9,7 +9,7 @@ const User = require('../models/user')
 
 const api = supertest(app)
 
-describe('when there is initially one user in db', () => {
+describe.only('when there is initially one user in db', () => {
   beforeEach(async () => {
     await User.deleteMany({})
 
@@ -39,6 +39,100 @@ describe('when there is initially one user in db', () => {
 
     const usernames = usersAtEnd.map(u => u.username)
     assert(usernames.includes(newUser.username))
+  })
+
+  describe('invalid user is not added to db', () => {
+    test('creation fails with status code 400 when username is less than 3 characters', async () => {
+      const usersAtStart = await helper.usersInDb()
+
+      const newUser = {
+        username: 'jd',
+        name: 'Jane Doe',
+        password: 'secret',
+      }
+
+      await api
+        .post('/api/users')
+        .send(newUser)
+        .expect(400)
+        .expect('Content-Type', /application\/json/)
+
+      const usersAtEnd = await helper.usersInDb()
+      assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+    })
+
+    test('creation fails with status code 400 when password is less than 3 characters', async () => {
+      const usersAtStart = await helper.usersInDb()
+
+      const newUser = {
+        username: 'janedoe',
+        name: 'Jane Doe',
+        password: 'x',
+      }
+
+      await api
+        .post('/api/users')
+        .send(newUser)
+        .expect(400)
+        .expect('Content-Type', /application\/json/)
+
+      const usersAtEnd = await helper.usersInDb()
+      assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+    })
+
+    test('creation fails with status code 400 when username is missing', async () => {
+      const usersAtStart = await helper.usersInDb()
+
+      const newUser = {
+        name: 'Jane Doe',
+        password: 'secret',
+      }
+
+      await api
+        .post('/api/users')
+        .send(newUser)
+        .expect(400)
+        .expect('Content-Type', /application\/json/)
+
+      const usersAtEnd = await helper.usersInDb()
+      assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+    })
+
+    test('creation fails with status code 400 when password is missing', async () => {
+      const usersAtStart = await helper.usersInDb()
+
+      const newUser = {
+        username: 'janedoe',
+        name: 'Jane Doe',
+      }
+
+      await api
+        .post('/api/users')
+        .send(newUser)
+        .expect(400)
+        .expect('Content-Type', /application\/json/)
+
+      const usersAtEnd = await helper.usersInDb()
+      assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+    })
+
+    test('creation fails with status code 400 when username is taken', async () => {
+      const usersAtStart = await helper.usersInDb()
+
+      const newUser = {
+        username: 'root',
+        password: 'secret',
+      }
+
+      await api
+        .post('/api/users')
+        .send(newUser)
+        .expect(400)
+        .expect('Content-Type', /application\/json/)
+
+      const usersAtEnd = await helper.usersInDb()
+      assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+    })
   })
 })
 
