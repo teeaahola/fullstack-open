@@ -1,9 +1,10 @@
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImphbmVkb2UiLCJpZCI6IjY5NWUzNDBkY2ZiNjg3ZjNiMmUzMWE3NSIsImlhdCI6MTc2Nzc4OTk3MH0.ghYxj0dmnLPD3V_IRecFPtHlKc8njT_APSD4bEudRxk
 
 {
-  "title": "Testing Model Middleware",
-  "author": "John Doe",
-  "url": "testurl",
-  "likes": 0
+  "title": "Canonical string reduction",
+  "author": "Edsger W. Dijkstra",
+  "url": "http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html",
+  "likes": 12
 }
