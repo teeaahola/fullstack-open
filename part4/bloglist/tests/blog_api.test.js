@@ -5,6 +5,7 @@ const supertest = require('supertest')
 const app = require('../app')
 const helper = require('./test_helper')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 const api = supertest(app)
 
@@ -12,6 +13,9 @@ describe('when there are initially some blogs saved', () => {
   beforeEach(async () => {
     await Blog.deleteMany({})
     await Blog.insertMany(helper.initialBlogs)
+    await User.deleteMany({})
+    await User.insertMany([])
+    await helper.saveUser()
   })
 
   test('blogs are returned as json', async () => {
@@ -41,7 +45,7 @@ describe('when there are initially some blogs saved', () => {
     assert(keys.includes('id'))
   })
 
-  describe('addition of a new blog', () => {
+  describe.only('addition of a new blog', () => {
 
     test('succeeds with valid data', async () => {
       const newBlog = {
@@ -51,9 +55,12 @@ describe('when there are initially some blogs saved', () => {
         likes: 0
       }
 
+      const user = await api.post('/api/login').send(helper.user)
+
       await api
         .post('/api/blogs')
         .send(newBlog)
+        .set({ Authorization: `Bearer ${user.body.token}` })
         .expect(201)
         .expect('Content-Type', /application\/json/)
 
@@ -72,9 +79,12 @@ describe('when there are initially some blogs saved', () => {
         url: 'test.url'
       }
 
+      const user = await api.post('/api/login').send(helper.user)
+
       await api
         .post('/api/blogs')
         .send(newBlog)
+        .set({ Authorization: `Bearer ${user.body.token}` })
         .expect(201)
         .expect('Content-Type', /application\/json/)
 
@@ -92,9 +102,12 @@ describe('when there are initially some blogs saved', () => {
         likes: 0
       }
 
+      const user = await api.post('/api/login').send(helper.user)
+
       await api
         .post('/api/blogs')
         .send(newBlog)
+        .set({ Authorization: `Bearer ${user.body.token}` })
         .expect(400)
 
       const blogsAtEnd = await helper.blogsInDb()
@@ -108,10 +121,30 @@ describe('when there are initially some blogs saved', () => {
         likes: 0
       }
 
+      const user = await api.post('/api/login').send(helper.user)
+
       await api
         .post('/api/blogs')
         .send(newBlog)
+        .set({ Authorization: `Bearer ${user.body.token}` })
         .expect(400)
+
+      const blogsAtEnd = await helper.blogsInDb()
+      assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
+    })
+
+    test('fails with status code 401 without token', async () => {
+      const newBlog = {
+        title: 'async/await simplifies making async calls',
+        author: 'test',
+        url: 'test.url',
+        likes: 0
+      }
+
+      await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(401)
 
       const blogsAtEnd = await helper.blogsInDb()
       assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
@@ -119,18 +152,33 @@ describe('when there are initially some blogs saved', () => {
   })
 
   describe('deletion of a blog', () => {
-    test('succeeds with status code 204 if id is valid', async () => {
+    test.only('succeeds with status code 204 if id is valid', async () => {
       const blogsAtStart = await helper.blogsInDb()
-      const blogToDelete = blogsAtStart[0]
 
-      await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204)
+      const user = await api.post('/api/login').send(helper.user)
+      const newBlog = {
+        title: 'async/await simplifies making async calls',
+        author: 'test',
+        url: 'test.url',
+        likes: 0
+      }
+      const response = await api.post('/api/blogs').set({ Authorization: `Bearer ${user.body.token}` }).send(newBlog)
+      const blogToDelete = response.body
+
+      const blogsBeforeDeletion = await helper.blogsInDb()
+
+      await api
+        .delete(`/api/blogs/${blogToDelete.id}`)
+        .set({ Authorization: `Bearer ${user.body.token}` })
+        .expect(204)
 
       const blogsAtEnd = await helper.blogsInDb()
 
       const titles = blogsAtEnd.map(n => n.title)
       assert(!titles.includes(blogToDelete.title))
 
-      assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1)
+      assert.strictEqual(blogsBeforeDeletion.length, blogsAtStart.length + 1)
+      assert.strictEqual(blogsAtEnd.length, blogsBeforeDeletion.length - 1)
     })
   })
 
