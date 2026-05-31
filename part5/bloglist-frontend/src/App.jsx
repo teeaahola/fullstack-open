@@ -79,6 +79,22 @@ const App = () => {
     setUser(null)
   }
 
+  const updateBlog = async (blog) => {
+    try{
+      const updatedBlog = await blogService.update(blog)
+      const updatedBlogs = blogs.map((blog) =>
+        blog.id === updatedBlog.id ? updatedBlog : blog
+      )
+      setBlogs(updatedBlogs)
+    }
+    catch {
+      setError(`error processing blog ${blog.title}`)
+      setTimeout(() => {
+        setError(null)
+      }, 3000)
+    }
+  }
+
   const blogForm = () => (
     <Togglable buttonLabel='create' ref={blogFormRef}>
       <BlogForm createBlog={createBlog} />
@@ -115,7 +131,7 @@ const App = () => {
           <p>{user.name ? user.name : user.username} logged in <button onClick={logout}>logout</button></p>
           {blogForm()}
           {blogs.map(blog =>
-            <Blog key={blog.id} blog={blog} />
+            <Blog key={blog.id} blog={blog} updateBlog={updateBlog} />
           )}
         </div>
       )}

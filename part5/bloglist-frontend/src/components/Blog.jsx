@@ -1,12 +1,17 @@
 import { useState } from 'react'
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, updateBlog }) => {
   const [visible, setVisible] = useState(false)
 
   const showWhenVisible = { display: visible ? '' : 'none' }
 
   const toggleVisibility = () => {
     setVisible(!visible)
+  }
+
+  const handleLike = () => {
+    const newBlog = {...blog, likes: blog.likes + 1}
+    updateBlog(newBlog)
   }
 
   return (
@@ -17,7 +22,7 @@ const Blog = ({ blog }) => {
         <div>{blog.url}</div>
         <div>
           {blog.likes}
-          <button onClick={() => console.log('like')}>like</button>
+          <button onClick={handleLike}>like</button>
         </div>
         <div>{blog?.user?.username}</div>
       </div>

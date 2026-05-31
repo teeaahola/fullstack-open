@@ -1,6 +1,7 @@
 const blogRouter = require('express').Router()
 const Blog = require('../models/blog')
 const { userExtractor } = require('../utils/middleware')
+const mongoose = require('mongoose')
 
 blogRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({}).populate('user', { username: 1, name: 1, id: 1 })
@@ -46,17 +47,28 @@ blogRouter.delete('/:id', userExtractor, async (request, response) => {
 })
 
 blogRouter.put('/:id', async (request, response) => {
-  const body = request.body
-  const blog = await Blog.findById(request.params.id)
-  if (!blog) return response.status(404).end
+  const { user, title, author, url, likes } = request.body
+  const id = request.params.id
 
-  blog.title = body.title
-  blog.author = body.author
-  blog.url = body.url
-  blog.likes = body.likes
+  if (!mongoose.Types.ObjectId.isValid(user)) {
+    return response.status(400).json({ error: 'Invalid user ID' })
+  }
 
-  const updatedBlog = await blog.save()
-  response.json(updatedBlog)
+  const blog = {
+    user: new mongoose.Types.ObjectId(user),
+    title,
+    author,
+    url,
+    likes
+  }
+
+  const updatedBlog = await Blog.findByIdAndUpdate(id, blog, {
+    new: true,
+  }).populate('user', { username: 1, name: 1 })
+
+  updatedBlog
+    ? response.status(200).json(updatedBlog)
+    : response.status(404).end()
 })
 
 module.exports = blogRouter
