@@ -56,7 +56,7 @@ const App = () => {
 
   const handleLogin = async event => {
     event.preventDefault()
-    
+
     try {
       const user = await loginService.login({ username, password })
       window.localStorage.setItem(
@@ -67,7 +67,7 @@ const App = () => {
       setUsername('')
       setPassword('')
     } catch {
-      setError(`wrong username or password`)
+      setError('wrong username or password')
       setTimeout(() => {
         setError(null)
       }, 3000)
@@ -135,7 +135,7 @@ const App = () => {
         setError(null)
       }, 3000)
     }
-  } 
+  }
 
   return (
     <div>
